@@ -1,1 +1,114 @@
 
+Editorial and solution for problem name (Find All Anagrams in a String) on  LeetCode.
+
+Problem Link : https://leetcode.com/problems/find-all-anagrams-in-a-string/
+
+----------------------------------------------------------------------------------------------------------------
+
+Problem Statement : Given a string s and a non-empty string p, find all the start indices of p's anagrams in s.
+
+Two string are anagaram of each other if after sort both the string individually they become same, means frequency 
+of each distinct character present in one string has to be same in other string. 
+
+----------------------------------------------------------------------------------------------------------------
+
+Solution
+--------
+
+Approach :  Two Pointer Technique 
+---------------------------------
+
+Intution : So, if index i is valid means substring from index (i) to index (i + length(p) - 1) is anagram of string p.
+Now for each position i in string p, we can count frequency of each  character in substring(i, i + length(p) - 1)
+by running a loop of length(p), Then we can tell whether that substring is anagram of string p or not.
+So, time complexity will be  length(s) * length(p).
+
+Can we reduce ? 
+Yes, If substring (i, j) in string(s) is anagram, then to check substring (i + 1, j + 1) is anagram or not where 
+j + 1 < length(p) we will simply add the contribution of position (j + 1) and will subtract the contribution of
+position(i) in the frequency array.
+
+Algorithm 
+---------
+
+Maintain, two frequency array one for substring s, of length(p) and other for frequency array of string(p)
+and four variables cntP, cntS, cntNonP, isHigh which are defined in the code.
+So, for new idx position in string s, we will  update the frequence array(sFreq) and will adjust the variables
+cntNonP, cnts, isHigh and for position(idx - length(p)) >= 0 we wil substract the contribution in array(sFreq) and again
+will update the variables cntNonP, cnts, isHigh.
+
+Implementation in C++
+---------------------
+
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        vector< int > pFreq(26, 0); // maintain frequency of character in string p
+        vector< int > sFreq(26, 0); // maintain frequency of character in string s
+        
+        int cntP = 0;  // count of distinct character in string p
+        int cntS = 0;  // count of distinct character present in string s in interval(idx - length(p) + 1, idx)
+        int cntNonP = 0; // count of character  present in string s in interval(idx - length(p) + 1, idx) 
+                         // which are not present in string p
+        int isHigh = 0;  // count of character  present in string s in interval(idx - length(p) + 1, idx) 
+                         // which have frequency higher then frequency present in p
+        
+        vector< int > result;
+        
+        for(int idx = 0; idx < (int)p.size(); ++idx) {
+            pFreq[ p[idx] - 'a' ]++;
+            if(pFreq[ p[idx] - 'a'] == 1) {
+                cntP++;
+            }
+        }
+        
+        for(int idx = 0; idx < (int)s.size(); ++idx) {
+            int pos = s[idx] - 'a';
+            sFreq[pos]++;
+            if(pFreq[pos] == 0) { // this  character is not present in p 
+                if(sFreq[pos] == 1) {
+                    cntNonP++;
+                }
+            } else {
+                if(sFreq[pos] == pFreq[pos]) {
+                    cntS++;
+                } else 
+                if(sFreq[pos] == 1 + pFreq[pos]) {
+                    isHigh++;
+                }
+            }
+            if(idx >= (int)p.size()) {
+                pos = s[idx - (int) p.size()] - 'a';
+                sFreq[pos]--;
+                if(pFreq[pos] == 0) {
+                    if(sFreq[pos] == 0) {
+                        cntNonP--;
+                    }
+                } else {
+                    if(sFreq[pos] == pFreq[pos]) {
+                        isHigh--;
+                    } else 
+                    if(sFreq[pos] + 1 == pFreq[pos]) {
+                        cntS--;
+                    }
+                }
+            }
+            if(cntS == cntP && cntNonP == 0 && isHigh == 0) {
+                result.push_back(idx - (int)p.size() + 1);
+            }
+        }         
+        return result;                
+    }
+};
+
+----------------------------------------------------------------------------------------------------------------
+
+Complexity Analysis : 
+
+Time Complexity: O(N), where N is the length of String(S).
+
+Space Complexity: O(26), because strings consists of lowercase English letters only.
+
+----------------------------------------------------------------------------------------------------------------
+
+
