@@ -1,0 +1,83 @@
+You are given three integers x, y, and z.
+
+You have x strings equal to "AA", y strings equal to "BB", and z strings equal to "AB". You want to choose some (possibly all or none) of these strings and concatenate them in some order to form a new string. This new string must not contain "AAA" or "BBB" as a substring.
+
+Return the maximum possible length of the new string.
+
+A substring is a contiguous non-empty sequence of characters within a string.
+
+ 
+
+Example 1:
+
+Input: x = 2, y = 5, z = 1
+Output: 12
+Explanation: We can concatenate the strings "BB", "AA", "BB", "AA", "BB", and "AB" in that order. Then, our new string is "BBAABBAABBAB". 
+That string has length 12, and we can show that it is impossible to construct a string of longer length.
+Example 2:
+
+Input: x = 3, y = 2, z = 2
+Output: 14
+Explanation: We can concatenate the strings "AB", "AB", "AA", "BB", "AA", "BB", and "AA" in that order. Then, our new string is "ABABAABBAABBAA". 
+That string has length 14, and we can show that it is impossible to construct a string of longer length.
+ 
+
+Constraints:
+
+1 <= x, y, z <= 50
+
+
+
+Solution:
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cstring>
+
+using namespace std;
+
+class Solution {
+// Complexity:  O(x * y * z)
+private:
+    // prev
+    // 0 -> nothing
+    // 1 -> AA
+    // 2 -> BB
+    // 3 -> AB
+    int dp[4][51][51][51];
+    
+    int findLongestString(int x, int y, int z, int prev) {
+        if (dp[prev][x][y][z] != -1) {
+            return dp[prev][x][y][z];
+        }
+
+        int maxLen = 0;
+        
+        if (prev == 0) { // Can place any string first
+            maxLen = 2 + findLongestString(x - 1, y, z, 1);
+            maxLen = max (maxLen, 2 + findLongestString(x, y - 1, z, 2));
+            maxLen = max (maxLen, 2 + findLongestString(x, y, z - 1, 3));     
+        } else if (prev == 1) { // Last was "AA", next can be "BB"
+            if (y > 0) {
+                maxLen = max(maxLen, 2 + findLongestString(x, y - 1, z, 2));
+            }
+        } else if (prev == 2 || prev == 3) { // Last was "BB" or "AB", next can be "AA" or "AB"
+            if (x > 0) {
+                maxLen = max(maxLen, 2 + findLongestString(x - 1, y, z, 1));
+            }
+            if (z > 0) {
+                maxLen = max(maxLen, 2 + findLongestString(x, y, z - 1, 3));
+            }
+        }
+        
+        return dp[prev][x][y][z] = maxLen;
+    }
+
+public:
+    int longestString(int x, int y, int z) {
+        memset(dp, -1, sizeof(dp));
+        return findLongestString(x, y, z, 0);
+    }
+};
