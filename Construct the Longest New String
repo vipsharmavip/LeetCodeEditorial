@@ -26,9 +26,39 @@ Constraints:
 
 1 <= x, y, z <= 50
 
-
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Solution:
+
+My approach to this problem was a recursive solution with memoization, a classic dynamic programming technique.
+
+The DP State: The core of my solution is a 4D DP state: dp[prev][x][y][z]. This state is crucial for tracking the progress and making optimal decisions at each step.
+
+x, y, z: Represent the number of "AA", "BB", and "AB" strings we have left to use.
+
+prev: A key variable indicating the type of the last string added. This prevents us from violating the "AAA" or "BBB" rule.
+
+1 for "AA"
+
+2 for "BB"
+
+3 for "AB"
+
+0 for the initial state.
+
+The Logic: The findLongestString function recursively explores all valid combinations.
+
+If the previous string was "AA" (prev == 1), the next string can only be "BB" (to avoid "AAA").
+
+If the previous string was "BB" or "AB" (prev == 2 or 3), the next string can be either "AA" or "AB" as they don't lead to the forbidden substrings.
+
+At each step, we recursively call the function with the updated counts and take the maximum length among all valid choices. Memoization is used to store the result for each state, ensuring we only compute it once.
+
+This approach provides a robust and systematic way to find the longest possible string by exploring all valid paths without re-computing the same subproblems.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Code:
 
 #include <iostream>
 #include <vector>
